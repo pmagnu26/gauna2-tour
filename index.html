@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>GAUNA 2 — Tour Arquitectónico 3D Interactivo</title>
 <style>
   :root {
@@ -17,8 +17,9 @@
     --pill-active-text: #0f172a;
     --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { width: 100%; height: 100%; overflow: hidden; background: #0b0f17; color: var(--text-main); font-family: var(--font); user-select: none; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { width: 100%; height: 100%; height: 100dvh; overflow: hidden; background: #0b0f17; color: var(--text-main); font-family: var(--font); user-select: none; }
+  button, label, canvas { touch-action: manipulation; }
   #canvas-wrap { position: fixed; inset: 0; }
   canvas { display: block; width: 100%; height: 100%; outline: none; }
 
@@ -202,9 +203,21 @@
     display: none !important;
   }
   @media (max-width: 780px) {
-    .hud-top { flex-wrap: wrap; }
-    .side-drawer { width: calc(100% - 28px); left: 14px; }
-    .control-panel { width: 100%; justify-content: space-between; }
+    .hud-top { top: max(10px, env(safe-area-inset-top)); left: 12px; right: 12px; flex-wrap: wrap; gap: 8px; }
+    .brand-card { padding: 7px 12px; border-radius: 10px; }
+    .brand-sub { display: none; }
+    .pill-bar, .top-right { max-width: 100%; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .pill-bar::-webkit-scrollbar, .top-right::-webkit-scrollbar { display: none; }
+    .hud-bottom { bottom: max(10px, env(safe-area-inset-bottom)); left: 12px; right: 12px; gap: 8px; }
+    .control-panel { width: 100%; padding: 9px 12px; gap: 10px; }
+    #room-pills { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+    #room-pills::-webkit-scrollbar { display: none; }
+    .side-drawer { top: auto; bottom: 0; left: 10px; right: 10px; width: auto; max-height: 62dvh; border-radius: 18px 18px 0 0; transform: translateY(110%); }
+    .side-drawer.open { transform: translateY(0); }
+    .tour-caption { top: auto; bottom: 90px; width: calc(100% - 24px); padding: 8px 12px; }
+  }
+  @media (pointer: coarse) {
+    .wasd-hint { display: none !important; }
   }
 
   /* ==================== SNOWDON TOWERS SHOWCASE MODE ==================== */
@@ -218,11 +231,18 @@
   }
   #st-showcase {
     position: fixed; inset: 0; z-index: 30;
+    width: 100%; height: 100%; height: 100dvh;
     display: none; overflow: hidden; background: #070a0f;
     font-family: var(--font);
   }
   body.st-mode #st-showcase { display: block; }
 
+  .st-pan-wrap {
+    position: absolute; inset: 0; overflow: hidden; background: #070a0f;
+  }
+  .st-stage {
+    position: relative; width: 100%; height: 100%;
+  }
   .st-viewport { position: absolute; inset: 0; overflow: hidden; background: #070a0f; }
   .st-layer {
     position: absolute; inset: 0; width: 100%; height: 100%;
@@ -242,12 +262,6 @@
   #st-trans-video {
     position: absolute; inset: 0; width: 100%; height: 100%;
     object-fit: cover; z-index: 3; display: none; background: #000;
-  }
-  .st-vignette {
-    position: absolute; inset: 0; z-index: 4; pointer-events: none;
-    background:
-      linear-gradient(180deg, rgba(6,9,14,0.58) 0%, rgba(6,9,14,0.08) 22%, rgba(6,9,14,0.04) 56%, rgba(6,9,14,0.78) 100%),
-      radial-gradient(circle at 18% 82%, rgba(6,9,14,0.55) 0%, transparent 52%);
   }
 
   /* Snowdon Top Header */
@@ -394,41 +408,12 @@
   .st-pin-title { font-size: 11px; font-weight: 700; color: #fff; line-height: 1.25; }
   .st-pin-meta { font-size: 9.5px; color: #cbd5e1; margin-top: 2px; }
 
-  /* Bottom Editorial Overlay (Snowdon Towers Left Hero + Right Filmstrip) */
+  /* Bottom Filmstrip Overlay (Right Filmstrip) */
   .st-bottom {
     position: absolute; left: 32px; right: 28px; bottom: 26px; z-index: 11;
-    display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+    display: flex; align-items: flex-end; justify-content: flex-end; gap: 24px;
     pointer-events: none;
   }
-  .st-editorial {
-    max-width: 520px; display: flex; flex-direction: column; gap: 10px;
-    pointer-events: auto; text-shadow: 0 2px 18px rgba(0,0,0,0.6);
-  }
-  .st-kicker {
-    font-size: 10.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
-    color: #fcd34d;
-  }
-  .st-title {
-    font-size: clamp(28px, 3.6vw, 46px); font-weight: 700; letter-spacing: -0.02em;
-    line-height: 1.04; color: #ffffff;
-  }
-  .st-desc {
-    font-size: 13px; line-height: 1.48; color: rgba(241, 245, 249, 0.88);
-    max-width: 460px;
-  }
-  .st-cta-row { display: flex; align-items: center; gap: 12px; margin-top: 2px; flex-wrap: wrap; }
-  .st-loc-tag {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
-    color: rgba(255,255,255,0.82);
-  }
-  .st-stats {
-    display: flex; align-items: flex-start; gap: 28px; margin-top: 6px;
-    padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.18);
-  }
-  .st-stat-val { font-size: 21px; font-weight: 700; color: #fff; letter-spacing: -0.01em; line-height: 1.1; }
-  .st-stat-val small { font-size: 12px; font-weight: 600; opacity: 0.82; margin-left: 2px; }
-  .st-stat-lbl { font-size: 10.5px; color: rgba(226,232,240,0.75); line-height: 1.25; margin-top: 2px; max-width: 96px; }
 
   /* Right Filmstrip & Audio */
   .st-right-bottom {
@@ -466,13 +451,83 @@
   }
   .st-nav-circle:hover { background: rgba(255,255,255,0.24); }
   .st-util-row { display: flex; align-items: center; gap: 8px; }
+  .st-swipe-hint {
+    display: none; position: fixed; left: 50%; bottom: calc(88px + env(safe-area-inset-bottom));
+    transform: translateX(-50%); z-index: 12; pointer-events: none;
+    background: rgba(12, 16, 23, 0.72); backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.22); color: #f8fafc;
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em;
+    padding: 6px 13px; border-radius: 999px; white-space: nowrap;
+    transition: opacity 0.4s ease;
+  }
+  .st-swipe-hint.fade { opacity: 0; }
+
+  @media (hover: none) {
+    .st-pin { width: 36px; height: 36px; font-size: 13px; }
+    .st-pin-card { display: none !important; }
+  }
 
   @media (max-width: 920px) {
-    .st-top { flex-wrap: wrap; left: 16px; right: 16px; top: 14px; }
-    .st-minimap { display: none; }
-    .st-bottom { flex-direction: column; align-items: flex-start; left: 18px; right: 18px; bottom: 16px; gap: 14px; }
-    .st-right-bottom { max-width: 100%; width: 100%; align-items: stretch; }
-    .st-thumbs { max-width: 100%; }
+    .st-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas: "brand actions" "zones zones" "tools tools";
+      align-items: center; gap: 8px 10px;
+      top: max(10px, env(safe-area-inset-top)); left: 12px; right: 12px;
+    }
+    .st-left-col { display: contents; }
+    .st-wordmark { grid-area: brand; }
+    .st-wm-main { font-size: 14px; letter-spacing: 0.14em; }
+    .st-wm-sub { font-size: 8.5px; letter-spacing: 0.16em; }
+    .st-right-pills { grid-area: actions; gap: 6px; flex-wrap: nowrap; }
+    .st-pill-ghost, .st-pill-white { font-size: 10px; padding: 7px 11px; letter-spacing: 0.06em; }
+    .st-zone-bar {
+      grid-area: zones; max-width: 100%; overflow-x: auto; scrollbar-width: none;
+      -webkit-overflow-scrolling: touch; justify-self: start;
+    }
+    .st-zone-bar::-webkit-scrollbar { display: none; }
+    .st-zone-btn { font-size: 10px; padding: 7px 12px; letter-spacing: 0.08em; }
+    .st-tools-left { grid-area: tools; gap: 6px; }
+    .st-compass { width: 30px; height: 30px; }
+    .st-compass-needle { border-bottom-width: 9px; }
+    .st-mini-toggle { padding: 6px 10px; font-size: 9.5px; }
+    .st-minimap {
+      position: fixed; top: calc(134px + env(safe-area-inset-top)); left: 12px;
+      width: 178px; z-index: 16;
+    }
+    #st-plan-canvas { height: 128px; }
+    .st-bottom {
+      left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom));
+      justify-content: center;
+    }
+    .st-right-bottom {
+      max-width: 100%; width: 100%; flex-direction: row;
+      align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .st-util-row { order: 1; flex-shrink: 0; }
+    .st-strip-bar { order: 2; flex: 1; min-width: 0; padding: 5px 7px; gap: 5px; border-radius: 14px; }
+    .st-thumbs { max-width: 100%; flex: 1; }
+    .st-thumb-item { width: 54px; border-radius: 6px; }
+    .st-nav-circle { width: 30px; height: 30px; font-size: 14px; }
+  }
+
+  @media (max-width: 920px) and (orientation: portrait) {
+    .st-pan-wrap {
+      overflow-x: auto; overflow-y: hidden;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    }
+    .st-pan-wrap::-webkit-scrollbar { display: none; }
+    .st-stage {
+      width: calc(100dvh * 16 / 9);
+      min-width: 100%;
+      height: 100%;
+    }
+    .st-swipe-hint { display: block; }
+  }
+
+  @media (max-width: 480px) {
+    #st-prev-btn, #st-next-btn { display: none; }
+    .st-wm-sub { display: none; }
   }
 </style>
 <script type="importmap">
@@ -490,14 +545,17 @@
 
 <!-- ==================== SNOWDON TOWERS PHOTOREALISTIC SHOWCASE ==================== -->
 <section id="st-showcase">
-  <div class="st-viewport">
-    <img id="st-img-a" class="st-layer visible kenburns" alt="Render A" />
-    <img id="st-img-b" class="st-layer" alt="Render B" />
-    <video id="st-trans-video" playsinline muted></video>
-    <div class="st-vignette"></div>
+  <div class="st-pan-wrap" id="st-pan-wrap">
+    <div class="st-stage" id="st-stage">
+      <div class="st-viewport">
+        <img id="st-img-a" class="st-layer visible kenburns" alt="Render A" />
+        <img id="st-img-b" class="st-layer" alt="Render B" />
+        <video id="st-trans-video" playsinline muted></video>
+      </div>
+      <div id="st-pins-layer"></div>
+    </div>
   </div>
-
-  <div id="st-pins-layer"></div>
+  <div class="st-swipe-hint" id="st-swipe-hint">⇄ Desliza para recorrer la vista</div>
 
   <!-- Top Bar -->
   <header class="st-top">
@@ -532,25 +590,13 @@
     </nav>
 
     <div class="st-right-pills">
-      <button class="st-pill-ghost" id="st-unit-btn">FT² / M²</button>
       <button class="st-pill-ghost" id="st-kling-btn" style="border-color:rgba(190,242,100,0.5);color:#bef264;">🎬 Videos Kling</button>
       <button class="st-pill-white" id="st-tour-btn">▶ Recorrido Guiado</button>
     </div>
   </header>
 
-  <!-- Bottom Editorial + Filmstrip -->
+  <!-- Bottom Filmstrip -->
   <footer class="st-bottom">
-    <div class="st-editorial">
-      <div class="st-kicker" id="st-kicker">EXTERIOR · ACCESO OESTE</div>
-      <h1 class="st-title" id="st-title">Gauna 2</h1>
-      <p class="st-desc" id="st-desc">Residencia unifamiliar contemporánea en madera de pino natural sobre pilotes, diseñada en tres niveles escalonados que acompañan la pendiente del terreno.</p>
-      <div class="st-cta-row">
-        <button class="st-pill-white" id="st-next-space-btn">Entrar al Proyecto →</button>
-        <span class="st-loc-tag" id="st-loc-tag">📍 NIVEL N+0.00 · 135 M² ÚTILES</span>
-      </div>
-      <div class="st-stats" id="st-stats"></div>
-    </div>
-
     <div class="st-right-bottom">
       <div class="st-util-row">
         <button class="st-nav-circle" id="st-audio-btn" title="Música ambiental">🔊</button>
@@ -598,7 +644,6 @@
   <div class="top-right">
     <button class="icon-btn" id="btn-roof" title="Mostrar/ocultar techumbres">🏠 Techo: ON</button>
     <button class="icon-btn" id="btn-pins" title="Mostrar/ocultar pines de recintos">📍 Pines</button>
-    <button class="icon-btn" id="btn-units">m² / ft²</button>
     <button class="icon-btn" id="btn-mute">🔊 Audio</button>
     <button class="icon-btn" id="btn-hf-studio" style="border-color: rgba(190,242,100,0.5); color: #bef264;">🎬 Estudio Higgsfield</button>
   </div>
@@ -4900,15 +4945,6 @@ document.getElementById('btn-pins').onclick = () => {
 };
 document.getElementById('btn-pins').classList.add('active');
 
-document.getElementById('btn-units').onclick = () => {
-  state.useSqFt = !state.useSqFt;
-  document.getElementById('btn-units').textContent = state.useSqFt ? 'ft² / m²' : 'm² / ft²';
-  if (state.activeRoomId) {
-    const r = MODEL.rooms.find(x => x.id === state.activeRoomId);
-    if (r) updateDrawerContent(r);
-  }
-};
-
 document.getElementById('btn-mute').onclick = () => {
   state.muted = !state.muted;
   document.getElementById('btn-mute').textContent = state.muted ? '🔇 Mute' : '🔊 Audio';
@@ -5553,23 +5589,8 @@ function formatAreaVal(m2) {
 }
 
 function renderStEditorial(shot) {
-  document.getElementById('st-kicker').textContent = `${shot.kicker} · VISTA ${String(shot.order).padStart(2, '0')}/18`;
-  document.getElementById('st-title').textContent = shot.title;
-  document.getElementById('st-desc').textContent = shot.desc;
-  document.getElementById('st-next-space-btn').textContent = shot.ctaLabel;
-  const areaMain = formatAreaVal(shot.areaM2);
-  document.getElementById('st-loc-tag').textContent = `📍 ${shot.level} · ${areaMain.num} ${areaMain.unit.toUpperCase()}`;
   document.getElementById('st-mm-angle-lbl').textContent = `${String(shot.order).padStart(2, '0')} / 18`;
   document.getElementById('st-compass-needle').style.transform = `rotate(${shot.mapDir}deg)`;
-
-  const statsEl = document.getElementById('st-stats');
-  statsEl.innerHTML = shot.stats.map(st => {
-    if (st.m2 !== undefined) {
-      const a = formatAreaVal(st.m2);
-      return `<div><div class="st-stat-val">${a.num}<small>${a.unit}</small></div><div class="st-stat-lbl">${st.lbl}</div></div>`;
-    }
-    return `<div><div class="st-stat-val">${st.raw}<small>${st.unit || ''}</small></div><div class="st-stat-lbl">${st.lbl}</div></div>`;
-  }).join('');
 
   // Zone pill highlight
   document.querySelectorAll('#st-zone-bar .st-zone-btn[data-zone]').forEach(btn => {
@@ -5757,6 +5778,16 @@ function playVideoTransitionIfAvailable(fromId, toId, imgIn, imgOut) {
   });
 }
 
+function centerMobileStage(shot, instant = false) {
+  const wrap = document.getElementById('st-pan-wrap');
+  if (!wrap) return;
+  const maxScroll = wrap.scrollWidth - wrap.clientWidth;
+  if (maxScroll <= 4) return;
+  const primaryPin = (shot.pins && shot.pins[0]) ? shot.pins[0].x / 100 : 0.5;
+  const targetLeft = Math.max(0, Math.min(maxScroll, primaryPin * wrap.scrollWidth - wrap.clientWidth * 0.5));
+  wrap.scrollTo({ left: targetLeft, behavior: instant ? 'auto' : 'smooth' });
+}
+
 async function goToShot(targetId, opts = {}) {
   const nextIdx = ST_SHOTS.findIndex(s => s.id === targetId);
   if (nextIdx < 0) return;
@@ -5784,6 +5815,7 @@ async function goToShot(targetId, opts = {}) {
   renderStEditorial(nextShot);
   renderStThumbs();
   drawFloorplanMinimap();
+  centerMobileStage(nextShot, false);
 
   // Check if a Kling .mp4 video exists for this transition
   const usedVideo = prevShot ? await playVideoTransitionIfAvailable(prevShot.id, nextShot.id, imgIn, imgOut) : false;
@@ -5837,10 +5869,25 @@ function initSnowdonShowcase() {
   const imgA = document.getElementById('st-img-a');
   imgA.src = first.file;
   imgA.classList.add('visible', 'kenburns');
+  if (window.innerWidth <= 920) {
+    state.stPlanVisible = false;
+    document.getElementById('st-minimap').classList.add('hidden');
+    document.getElementById('st-btn-plan').classList.remove('active');
+  }
   renderStEditorial(first);
   renderStPins(first);
   renderStThumbs();
   drawFloorplanMinimap();
+  requestAnimationFrame(() => centerMobileStage(first, true));
+
+  const panWrap = document.getElementById('st-pan-wrap');
+  const swipeHint = document.getElementById('st-swipe-hint');
+  if (swipeHint) {
+    const hideHint = () => swipeHint.classList.add('fade');
+    panWrap.addEventListener('scroll', hideHint, { passive: true, once: true });
+    panWrap.addEventListener('touchstart', hideHint, { passive: true, once: true });
+    setTimeout(hideHint, 4200);
+  }
 }
 
 // Guided Photorealistic Walkthrough following nextId architectural flow
@@ -5987,23 +6034,8 @@ document.getElementById('st-btn-pins').onclick = (e) => {
   renderStPins(ST_SHOTS[stCurrentIdx]);
 };
 
-document.getElementById('st-unit-btn').onclick = () => {
-  state.useSqFt = !state.useSqFt;
-  document.getElementById('btn-units').textContent = state.useSqFt ? 'ft² / m²' : 'm² / ft²';
-  renderStEditorial(ST_SHOTS[stCurrentIdx]);
-  renderStPins(ST_SHOTS[stCurrentIdx]);
-};
-
 document.getElementById('st-tour-btn').onclick = () => {
   state.stTourActive ? stopStTour() : startStTour();
-};
-
-document.getElementById('st-next-space-btn').onclick = () => {
-  stopStTour();
-  const cur = ST_SHOTS[stCurrentIdx];
-  const nextId = cur.nextId || ST_SHOTS[(stCurrentIdx + 1) % ST_SHOTS.length].id;
-  const matchPin = cur.pins.find(p => p.target === nextId);
-  goToShot(nextId, matchPin ? { originX: matchPin.x, originY: matchPin.y } : {});
 };
 
 document.getElementById('st-prev-btn').onclick = () => {
