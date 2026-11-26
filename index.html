@@ -467,6 +467,24 @@
     .st-pin-card { display: none !important; }
   }
 
+  body.st-pure-view .st-top,
+  body.st-pure-view .st-bottom,
+  body.st-pure-view #st-pins-layer,
+  body.st-pure-view .st-swipe-hint {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.25s ease;
+  }
+  .st-restore-ui {
+    display: none; position: fixed; right: 20px; bottom: max(18px, env(safe-area-inset-bottom));
+    z-index: 35; background: rgba(12, 16, 23, 0.45); backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.22); color: rgba(255,255,255,0.88);
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 8px 14px; border-radius: 999px; cursor: pointer;
+    opacity: 0.6; transition: opacity 0.2s, background 0.2s;
+  }
+  .st-restore-ui:hover { opacity: 1; background: rgba(12, 16, 23, 0.82); color: #fff; }
+  body.st-pure-view .st-restore-ui { display: inline-flex; align-items: center; gap: 6px; }
   @media (max-width: 920px) {
     .st-top {
       display: grid;
@@ -590,10 +608,13 @@
     </nav>
 
     <div class="st-right-pills">
-      <button class="st-pill-ghost" id="st-kling-btn" style="border-color:rgba(190,242,100,0.5);color:#bef264;">🎬 Videos Kling</button>
-      <button class="st-pill-white" id="st-tour-btn">▶ Recorrido Guiado</button>
+      <button class="st-pill-ghost" id="st-pure-btn" title="Ocultar interfaz y ver solo la imagen (H)">👁 Solo Foto</button>
+      <button class="st-pill-ghost" id="st-kling-btn" style="border-color:rgba(190,242,100,0.5);color:#bef264;">🎬 Videos</button>
+      <button class="st-pill-white" id="st-tour-btn">▶ Recorrido</button>
     </div>
   </header>
+
+  <button class="st-restore-ui" id="st-restore-btn">👁 Mostrar UI</button>
 
   <!-- Bottom Filmstrip -->
   <footer class="st-bottom">
@@ -3491,7 +3512,7 @@ window.GAUNA_MODEL = {
     }
   ]
 };
-window.GAUNA_VIDEOS = ["02_fachada_acceso__15_hall_hacia_comedor", "04_cocina_comedor_frente__16_living_hacia_terraza", "15_hall_hacia_comedor__04_cocina_comedor_frente"];
+window.GAUNA_VIDEOS = ["02_fachada_acceso__15_hall_hacia_comedor", "04_cocina_comedor_frente__16_living_hacia_terraza", "15_hall_hacia_comedor__04_cocina_comedor_frente", "18_fachada_general_autos__02_fachada_acceso"];
 </script>
 
 <script type="module">
@@ -5385,7 +5406,7 @@ const ST_SHOTS = [
     ],
     pins: [
       { n: 1, x: 23, y: 49, target: '11_patio_este', label: 'Patio Este & Baranda' },
-      { n: 2, x: 46, y: 48, target: '16_living_hacia_terraza', label: 'Living Hundido' },
+      { n: 2, x: 40, y: 46, target: '16_living_hacia_terraza', label: 'Living Hundido' },
       { n: 3, x: 73, y: 56, target: '12_quincho_pergola', label: 'Quincho & Pérgola' },
       { n: 4, x: 7, y: 42, target: '08_dormitorio_principal_c', label: 'Dormitorio Principal' }
     ]
@@ -5687,7 +5708,7 @@ function drawFloorplanMinimap() {
     planCtx.stroke();
   }
 
-  // Draw camera dots for all 18 shots
+  // Draw red pin dots for all 18 shots on interactive floorplan
   const active = ST_SHOTS[stCurrentIdx];
   for (const s of ST_SHOTS) {
     const [px, py] = mapToCanvas(s.mapPos[0], s.mapPos[1]);
@@ -5698,8 +5719,8 @@ function drawFloorplanMinimap() {
       const spread = 0.46;
       const len = 42;
       const grad = planCtx.createRadialGradient(px, py, 2, px, py, len);
-      grad.addColorStop(0, 'rgba(251, 191, 36, 0.58)');
-      grad.addColorStop(1, 'rgba(251, 191, 36, 0.0)');
+      grad.addColorStop(0, 'rgba(239, 68, 68, 0.56)');
+      grad.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
       planCtx.fillStyle = grad;
       planCtx.beginPath();
       planCtx.moveTo(px, py);
@@ -5708,14 +5729,12 @@ function drawFloorplanMinimap() {
       planCtx.fill();
     }
     planCtx.beginPath();
-    planCtx.arc(px, py, isAct ? 6.2 : 3.6, 0, Math.PI * 2);
-    planCtx.fillStyle = isAct ? '#fbbf24' : 'rgba(255,255,255,0.55)';
+    planCtx.arc(px, py, isAct ? 6.5 : 4.1, 0, Math.PI * 2);
+    planCtx.fillStyle = isAct ? '#ff2d20' : '#ef4444';
     planCtx.fill();
-    if (isAct) {
-      planCtx.lineWidth = 2;
-      planCtx.strokeStyle = '#ffffff';
-      planCtx.stroke();
-    }
+    planCtx.lineWidth = isAct ? 2.2 : 1.1;
+    planCtx.strokeStyle = isAct ? '#ffffff' : 'rgba(255, 255, 255, 0.72)';
+    planCtx.stroke();
   }
 }
 
@@ -6073,12 +6092,20 @@ document.getElementById('st-kling-close').onclick = () => {
   document.getElementById('st-kling-modal').classList.remove('open');
 };
 
+function setPureView(on) {
+  document.body.classList.toggle('st-pure-view', on);
+}
+document.getElementById('st-pure-btn').onclick = () => setPureView(true);
+document.getElementById('st-restore-btn').onclick = () => setPureView(false);
+
 window.addEventListener('keydown', (e) => {
   if (!state.showcaseActive) return;
   if (document.getElementById('st-kling-modal').classList.contains('open')) {
     if (e.key === 'Escape') document.getElementById('st-kling-modal').classList.remove('open');
     return;
   }
+  if (e.key === 'Escape' && document.body.classList.contains('st-pure-view')) { setPureView(false); return; }
+  if (e.key.toLowerCase() === 'h') { setPureView(!document.body.classList.contains('st-pure-view')); return; }
   if (e.key === 'ArrowRight') { stopStTour(); goToShot(ST_SHOTS[(stCurrentIdx + 1) % ST_SHOTS.length].id); }
   if (e.key === 'ArrowLeft')  { stopStTour(); goToShot(ST_SHOTS[(stCurrentIdx - 1 + ST_SHOTS.length) % ST_SHOTS.length].id); }
 });
