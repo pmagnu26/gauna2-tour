@@ -3512,7 +3512,7 @@ window.GAUNA_MODEL = {
     }
   ]
 };
-window.GAUNA_VIDEOS = ["02_fachada_acceso__15_hall_hacia_comedor", "04_cocina_comedor_frente__16_living_hacia_terraza", "15_hall_hacia_comedor__04_cocina_comedor_frente", "18_fachada_general_autos__02_fachada_acceso"];
+window.GAUNA_VIDEOS = ["02_fachada_acceso__15_hall_hacia_comedor", "04_cocina_comedor_frente__05_comedor_hacia_hall", "04_cocina_comedor_frente__16_living_hacia_terraza", "05_comedor_hacia_hall__06_cocina_comedor_living", "06_cocina_comedor_living__16_living_hacia_terraza", "15_hall_hacia_comedor__04_cocina_comedor_frente", "18_fachada_general_autos__02_fachada_acceso"];
 </script>
 
 <script type="module">
@@ -5406,7 +5406,7 @@ const ST_SHOTS = [
     ],
     pins: [
       { n: 1, x: 23, y: 49, target: '11_patio_este', label: 'Patio Este & Baranda' },
-      { n: 2, x: 40, y: 46, target: '16_living_hacia_terraza', label: 'Living Hundido' },
+      { n: 2, x: 46, y: 48, target: '16_living_hacia_terraza', label: 'Living Hundido' },
       { n: 3, x: 73, y: 56, target: '12_quincho_pergola', label: 'Quincho & Pérgola' },
       { n: 4, x: 7, y: 42, target: '08_dormitorio_principal_c', label: 'Dormitorio Principal' }
     ]
@@ -5570,10 +5570,13 @@ const ST_SHOTS = [
 ];
 
 const KLING_PAIRS = [
-  { from: '02_fachada_acceso', to: '15_hall_hacia_comedor', name: 'Pórtico Acceso → Hall & Comedor', prompt: 'Smooth first-person architectural gimbal walkthrough stepping up the wooden front porch steps as the dark matte charcoal entry door swings open smoothly inward, gliding inside the vertical-pine foyer and turning gently left to reveal the sunlit dining room and kitchen ahead, steady 24fps camera motion, preserve exact architecture and wood lines, no morphing.' },
-  { from: '15_hall_hacia_comedor', to: '04_cocina_comedor_frente', name: 'Hall → Cocina & Comedor', prompt: 'Smooth architectural gimbal dolly forward gliding past the vertical-pine partition wall into the open sunlit dining and kitchen space, panning smoothly to frame the L-shaped oak cabinetry, dark stone countertop, stainless refrigerator, and wooden dining table with white chairs, natural golden sunlight, steady motion, no distortion.' },
-  { from: '04_cocina_comedor_frente', to: '16_living_hacia_terraza', name: 'Cocina & Comedor → Living Hundido', prompt: 'Smooth steady architectural gimbal walkthrough gliding forward past the wooden dining table and around the vertical-pine half-wall, descending three oak steps into the sunlit sunken living room facing the large black-framed terrace glass doors and wooden pergola outside, natural golden-hour light, realistic spatial physics, no morphing.' },
-  { from: '18_fachada_general_autos', to: '02_fachada_acceso', name: 'Llegada → Pórtico Acceso', prompt: 'Smooth architectural gimbal push-in walking along the gravel path toward the wooden front porch steps of the timber house, warm golden-hour sunlight, steady camera, no morphing.' },
+  { from: '18_fachada_general_autos', to: '02_fachada_acceso', name: '01 → 02 Llegada → Pórtico Acceso (MAGI-2)', prompt: 'Smooth continuous architectural gimbal dolly walking steadily forward along the compacted gravel path past the parked cars toward the front wooden porch steps.' },
+  { from: '02_fachada_acceso', to: '15_hall_hacia_comedor', name: '02 → 04 Pórtico Acceso → Hall & Comedor', prompt: 'Smooth first-person architectural gimbal walkthrough stepping up the wooden front porch steps as the dark matte charcoal entry door swings open smoothly inward, gliding inside the vertical-pine foyer and turning gently left to reveal the sunlit dining room and kitchen ahead, steady 24fps camera motion, preserve exact architecture and wood lines, no morphing.' },
+  { from: '15_hall_hacia_comedor', to: '04_cocina_comedor_frente', name: '04 → 05 Hall → Cocina & Comedor', prompt: 'Smooth architectural gimbal dolly forward gliding past the vertical-pine partition wall into the open sunlit dining and kitchen space, panning smoothly to frame the L-shaped oak cabinetry, dark stone countertop, stainless refrigerator, and wooden dining table with white chairs, natural golden sunlight, steady motion, no distortion.' },
+  { from: '04_cocina_comedor_frente', to: '05_comedor_hacia_hall', name: '05 → 06 Cocina → Vista hacia Hall', prompt: 'Smooth steady architectural gimbal orbit gliding around the wooden dining table to reveal the dark-stone peninsula cooktop, large window, and entry corridor.' },
+  { from: '05_comedor_hacia_hall', to: '06_cocina_comedor_living', name: '06 → 07 Península → Bajada Living', prompt: 'Smooth continuous gimbal pan from behind the peninsula counter across the dining table toward the pine half-wall, stove flue pipe, and steps down into the living room.' },
+  { from: '06_cocina_comedor_living', to: '16_living_hacia_terraza', name: '07 → 08 Bajada → Living Hundido', prompt: 'Smooth architectural gimbal descending three oak steps past the pine half-wall and black stove flue pipe into the sunlit sunken living room facing the glass terrace doors.' },
+  { from: '04_cocina_comedor_frente', to: '16_living_hacia_terraza', name: '05 → 08 Cocina & Comedor → Living Hundido', prompt: 'Smooth steady architectural gimbal walkthrough gliding forward past the wooden dining table and around the vertical-pine half-wall, descending three oak steps into the sunlit sunken living room facing the large black-framed terrace glass doors and wooden pergola outside, natural golden-hour light, realistic spatial physics, no morphing.' },
   { from: '16_living_hacia_terraza', to: '17_living_hacia_estufa_comedor', name: 'Living Ventanales → Chimenea', prompt: 'Slow cinematic orbit across the sunken living room turning from the terrace glass doors toward the black wood-burning stove and beige sectional sofa, warm sunset light.' },
   { from: '16_living_hacia_terraza', to: '12_quincho_pergola', name: 'Living → Salida al Quincho', prompt: 'Smooth gimbal push-out passing through the open black-framed sliding glass doors onto the sunlit timber deck and pergola quincho overlooking green rolling hills.' },
   { from: '11_patio_este', to: '12_quincho_pergola', name: 'Patio Este → Quincho Pérgola', prompt: 'Smooth exterior architectural walkthrough gliding along the elevated timber deck from the covered lounge terrace down three steps into the wooden pergola BBQ dining terrace.' },
